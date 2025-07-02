@@ -12,7 +12,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["DeoTools/GeoTools/GeoTools.csproj", "GeoTools/GeoTools/"]
+COPY ["GeoTools/GeoTools/GeoTools.csproj", "GeoTools/GeoTools/"]
 COPY ["GeoTools/GeoTools.Client/GeoTools.Client.csproj", "GeoTools/GeoTools.Client/"]
 RUN dotnet restore "GeoTools/GeoTools/GeoTools.csproj"
 COPY . .
