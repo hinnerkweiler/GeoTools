@@ -16,23 +16,18 @@ public class LocationLookupService
 
     public async Task<LocationInfoDto?> LookupAsync(double lat, double lon)
     {
-        var sql = """
-                  WITH point AS (
-                      SELECT ST_SetSRID(ST_MakePoint(@lon, @lat), 4326) AS geom
-                  )
-                  SELECT
-                      (SELECT name FROM seanamesiho s WHERE ST_Contains(s.geom, point.geom) LIMIT 1) AS "SeaRegion",
-                      (SELECT featurecla FROM marinepoly e WHERE ST_Contains(e.geom, point.geom) LIMIT 1) AS "MarinePoly",
-                      (SELECT TERRITORY1 FROM archipelagicwaters m WHERE ST_Contains(m.geom, point.geom) LIMIT 1) AS "Archipelago"
-                  FROM point;
-                  """;
+        // Create the SQL as a FormattableString with interpolated parameters
+        FormattableString sql = $@"
+        WITH point AS (
+            SELECT ST_SetSRID(ST_MakePoint({lon}, {lat}), 4326) AS geom
+        )
+        SELECT
+            (SELECT name FROM seanamesiho s WHERE ST_Contains(s.geom, point.geom) LIMIT 1) AS ""SeaRegion"",
+            (SELECT featurecla FROM marinepoly e WHERE ST_Contains(e.geom, point.geom) LIMIT 1) AS ""MarinePoly"",
+            (SELECT TERRITORY1 FROM archipelagicwaters m WHERE ST_Contains(m.geom, point.geom) LIMIT 1) AS ""Archipelago""
+        FROM point";
 
-        var param = new[]
-        {
-            new NpgsqlParameter("lat", lat),
-            new NpgsqlParameter("lon", lon)
-        };
-
-        return await _db.Set<LocationInfoDto>().FromSqlRaw(sql, param).AsNoTracking().FirstOrDefaultAsync();
+        var result = await _db.Database.SqlQuery<LocationInfoDto>(sql).FirstOrDefaultAsync();
+        return result;
     }
 }
