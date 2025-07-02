@@ -5,6 +5,7 @@ using GeoTools.Components;
 using GeoTools.Components.Account;
 using GeoTools.Data;
 using GeoTools.Services;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,15 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "DataProtectionKeys")));
+
+var keyDirectory = new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "DataProtectionKeys"));
+if (!keyDirectory.Exists)
+{
+    keyDirectory.Create();
+}
 
 builder.Services.AddAuthentication(options =>
     {
