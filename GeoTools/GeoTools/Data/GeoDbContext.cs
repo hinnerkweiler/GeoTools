@@ -6,9 +6,11 @@ namespace GeoTools.Data;
 public class GeoDbContext : DbContext
 {
     public GeoDbContext(DbContextOptions<GeoDbContext> options) : base(options) {}
+    
+    public DbSet<Models.LocationInfoDto> LocationInfos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Optional: if you want to define DbSet<>s later
+       
     }
 }
