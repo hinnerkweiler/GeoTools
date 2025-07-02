@@ -22,8 +22,20 @@ builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
+builder.Services.AddAntiforgery(options =>
+{
+    // Set cookie properties to be more resilient
+    options.Cookie.Name = "XSRF-TOKEN-GEOTOOLS";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.HeaderName = "X-XSRF-TOKEN";
+    // Extend token lifetime
+    options.FormFieldName = "__RequestVerificationToken";
+});
+
 builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "DataProtectionKeys")));
+    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "DataProtectionKeys")))
+    .SetApplicationName("GeoTools");
 
 var keyDirectory = new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "DataProtectionKeys"));
 if (!keyDirectory.Exists)
