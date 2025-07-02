@@ -29,7 +29,7 @@ builder.Services.AddAuthentication(options =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<GeoDbContext>(options =>
-    options.UseNpgsql(Environment.GetEnvironmentVariable("GEO_TOOLS_DB_CONNECTION_STRING") ?? "",
+    options.UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? "Host=localhost;Database=hinnerk;Username=hinnerk;",
         x => x.UseNetTopologySuite()));
 
 builder.Services.AddScoped<LocationLookupService>();
@@ -41,7 +41,16 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
+
+
 var app = builder.Build();
+
+// Apply migrations at startup
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<GeoDbContext>();
+    dbContext.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
