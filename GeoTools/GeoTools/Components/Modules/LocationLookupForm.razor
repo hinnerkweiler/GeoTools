@@ -31,10 +31,12 @@ else if (LocationInfo != null)
         <div class="card-body">
             <h5 class="card-title">Location Information</h5>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item"><strong>Sea Region:</strong> @(LocationInfo.SeaRegion ?? "Unknown")</li>
-                <li class="list-group-item"><strong>Marine Poly:</strong> @(LocationInfo.MarinePoly ?? "Unknown")</li>
+                <li class="list-group-item"><strong>Sea Name (IHO):</strong> @(LocationInfo.SeaRegion ?? "Unknown")</li>
+                <li class="list-group-item"><strong>Sea Region :</strong> @(LocationInfo.MarinePoly ?? "Unknown")</li>
                 <li class="list-group-item"><strong>Archipelago:</strong> @(LocationInfo.Archipelago ?? "Unknown")</li>
             </ul>
+            <h5>Data Source</h5>
+            <p>Flanders Marine Institute (2018). IHO Sea Areas, version 3. Available online at https://www.marineregions.org/. https://doi.org/10.14284/323</p>
         </div>
     </div>
 }
