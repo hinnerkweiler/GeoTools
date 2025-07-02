@@ -1,0 +1,76 @@
+@page "/location-lookup"
+@using GeoTools.Services
+@using GeoTools.Data
+@using GeoTools.Data.Models
+@inject LocationLookupService LocationService
+
+<h3>Location Lookup</h3>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="form-group mb-2">
+            <label for="latitude">Latitude:</label>
+            <input type="number" step="any" class="form-control" id="latitude" @bind="Latitude" />
+        </div>
+        <div class="form-group mb-2">
+            <label for="longitude">Longitude:</label>
+            <input type="number" step="any" class="form-control" id="longitude" @bind="Longitude" />
+        </div>
+        <button class="btn btn-primary" @onclick="LookupLocation">Lookup Location</button>
+    </div>
+</div>
+
+@if (IsLoading)
+{
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+}
+else if (LocationInfo != null)
+{
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">Location Information</h5>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Sea Region:</strong> @(LocationInfo.SeaRegion ?? "Unknown")</li>
+                <li class="list-group-item"><strong>Marine Poly:</strong> @(LocationInfo.MarinePoly ?? "Unknown")</li>
+                <li class="list-group-item"><strong>Archipelago:</strong> @(LocationInfo.Archipelago ?? "Unknown")</li>
+            </ul>
+        </div>
+    </div>
+}
+else if (ErrorMessage != null)
+{
+    <div class="alert alert-danger mt-3">@ErrorMessage</div>
+}
+
+@code {
+    private double Latitude { get; set; } = 51.507351;
+    private double Longitude { get; set; } = -0.127758;
+    private LocationInfoDto? LocationInfo { get; set; }
+    private string? ErrorMessage { get; set; }
+    private bool IsLoading { get; set; }
+
+    private async Task LookupLocation()
+    {
+        try
+        {
+            ErrorMessage = null;
+            IsLoading = true;
+            LocationInfo = await LocationService.LookupAsync(Latitude, Longitude);
+            if (LocationInfo == null)
+            {
+                ErrorMessage = "No location information found for these coordinates.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error looking up location: {ex.Message}";
+            LocationInfo = null;
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+}
